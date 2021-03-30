@@ -17,7 +17,7 @@ const Consumer = require('./models/consumer');
             logger.log(sender.constructor.name, ' Consume more item: ', JSON.stringify(item));
             sender.consume(item);
         }
-        else{
+        else if(sender.queue.isEmpty()){
             logger.log('');
             logger.log('*'.repeat(39))
             logger.log('* !!! DONE HANDLER ALL DATA ITEMS !!! *');
