@@ -135,7 +135,11 @@ class Consumer extends Intervalable {
             await this._handledItemHandler(item);
         }
         catch (e) {
-            logger.error(`${this.constructor.name} handler was failed with error: `, e && e.toString());
+            const itemDescription = item
+                ? (item.request_id && `request_id: '${item.request_id}'`) || item.data && `data: '${item.data}'`
+                : this.constructor.name;
+
+            logger.error(`${itemDescription} item handler was failed with error: `, e && e.toString());
         }
         finally {
             logger.log('#'.repeat(80));

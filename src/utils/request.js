@@ -42,6 +42,9 @@ class Request {
 
     async getResponse(request_id){
         logger.debug(`sending request to "GET:${this.url}" with request id:`, request_id )
+
+        // THERE IS PROBLEM WITH AXIOS ON THIS API, THAT NOT RECOGNIZED THE REQUEST_ID REQUEST.
+
         const { data: result } = await axios({
                 method: 'GET',
                 url: `${this.url}?request_id=${request_id}`
