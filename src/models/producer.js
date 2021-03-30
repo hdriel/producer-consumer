@@ -16,7 +16,7 @@ class Producer {
     }
 
     produce(inputData){
-        logger.log('Produce: ', inputData);
+        logger.debug('Produce: ', inputData);
         this.queue.enqueue(new Item({ data: inputData, request_id: null }));
     }
 

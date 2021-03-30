@@ -26,6 +26,13 @@ class Request {
             body: {
                 data: number
             }
+        }).catch(err => {
+            const { status, statusText } = err.response;
+            if(status === 403){
+                return { data: null };
+            }
+
+            throw statusText;
         });
         logger.debug('request was successfully send with response request id: ', data );
         return data;
@@ -39,7 +46,7 @@ class Request {
             })
             .catch(err => {
                 const { status, statusText } = err.response;
-                if(status === 400 && statusText !== 'Bad Request'){
+                if(status === 400 /* && statusText !== 'Bad Request' */){
                     return { data: null };
                 }
 

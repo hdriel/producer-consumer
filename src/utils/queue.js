@@ -5,7 +5,7 @@ class Queue {
     }
 
     enqueue(e) {
-        if(this.size && this._length() + 1 > this.size){
+        if(this.size && this.length() + 1 > this.size){
             throw `Try to push maximum ${this.constructor.name} queue size (${this.size})`;
         }
 
@@ -17,15 +17,23 @@ class Queue {
     }
 
     isEmpty() {
-        return this._length() === 0;
+        return this.length() === 0;
     }
 
     isFull() {
-        return this.size && this._length() === this.size;
+        return this.size && this.length() >= this.size;
     }
 
-    _length() {
+    length() {
         return this.elements.length;
+    }
+
+    resize(size){
+        this.size = size;
+    }
+
+    isLimitedQueue(){
+        return !!this.size;
     }
 }
 
