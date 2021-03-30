@@ -14,7 +14,7 @@ describe('Test PRODUCER' , function () {
 
         const item = producer.pull();
         expect(producer.queue.isEmpty()).toBeTruthy();
-        expect(item).toHaveProperty('inputData', 4);
+        expect(item).toHaveProperty('data', 4);
         expect(item).toHaveProperty('request_id', null);
     })
 });
