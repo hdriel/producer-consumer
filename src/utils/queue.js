@@ -1,5 +1,5 @@
 class Queue {
-    constructor(size) {
+    constructor(size = 0) {
         this.elements = [];
         this.size = size;
     }
