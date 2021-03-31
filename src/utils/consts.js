@@ -5,7 +5,7 @@ const consts = {};
 // I created my server to handle same behavior as the following API Server: 'http://35.195.195.133:9005'
 consts.LOCAL_SERVER = {
     DYNAMIC_SCALE_TASKS: false,
-    DYNAMIC_SCALE_TASKS_MIN_SIZE: 2,
+    DYNAMIC_SCALE_TASKS_MIN_SIZE: 5,
     DYNAMIC_SCALE_TASKS_MAX_SIZE: 10,
     PORT: 3000,
     API_END_POINT: `http://localhost:3000`,
