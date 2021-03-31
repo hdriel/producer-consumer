@@ -2,6 +2,7 @@ const inputData = require('./data');
 const logger = require('./utils/logger');
 const Producer = require('./models/producer');
 const Consumer = require('./models/consumer');
+const doneItems = require('./models/doneItems');
 
 (async () => {
     const producer = new Producer();
@@ -48,6 +49,8 @@ const Consumer = require('./models/consumer');
             logger.log('*'.repeat(39))
             logger.log('* !!! DONE HANDLER ALL DATA ITEMS !!! *');
             logger.log('*'.repeat(39))
+            logger.log('DONE ITEMS');
+            logger.log(doneItems.toString());
             process.exit(0);
         }
     });

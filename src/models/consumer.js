@@ -6,7 +6,7 @@ const Intervalable = require('../utils/intervalable');
 const logger = require('../utils/logger');
 const messages = require('../utils/messages');
 const AvailableEventArgs = require('../utils/availabelEventArg');
-
+const doneItems = require('./doneItems');
 /**
  * Singleton
  * Observer
@@ -111,6 +111,8 @@ class Consumer extends Intervalable {
             // Then result is null it's mean the server hasn't finished the request_id task yet, so re-enqueue to try in next loop
             if(result){
                 item.result = result;
+                doneItems.enqueue(item);
+
                 logger.log(`Release place in ${this.constructor.name} queue, { '${item.request_id}': ${result} }`);
                 this.availableEvent.fire(this, new AvailableEventArgs({
                     message: messages.DONE_ITEM_QUEUE(),
@@ -156,6 +158,14 @@ class Consumer extends Intervalable {
                 : this.constructor.name;
 
             logger.error(`${itemDescription} item handler was failed with error: `, e && e.toString());
+
+            item.retry--;
+            if(item.retry > 0){
+                if(this.queue.isFull()){
+                    this.queue.resize(this.queue.size+1);
+                }
+                this.queue.enqueue(item);
+            }
         }
         finally {
             logger.log('#'.repeat(80));

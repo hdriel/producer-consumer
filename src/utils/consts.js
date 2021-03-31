@@ -19,6 +19,7 @@ consts.API_END_POINT = consts.LOCAL_SERVER.USE_LOCAL_SERVER
     : 'http://35.195.195.133:9005';
 
 consts.CONSUMER_SIZE = 2;
+consts.RETRY_FAILED = 3;
 consts.CONSUMER_INTERVAL = 500;
 consts.DEBUG_MODE = true;
 consts.LOGGING_MODES = {
