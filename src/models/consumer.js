@@ -61,19 +61,19 @@ class Consumer extends Intervalable {
         }
     }
 
-    async _unhandledItemHandler(item){
+    async _unhandledItemHandler(item, returnedToQueue){
         if(item && !item.request_id){
             logger.debug(`ITEM IS UNHANDLED STATE - SEND REQUEST FOR ASKING REQUEST_ID`);
 
-            const response = await request.sendRequest(item.inputData);
+            const response = await request.sendRequest(item.data);
             const isWasLimitedQueue = this.queue.isLimitedQueue();
 
             // When response is null - we got status code 403 from cooperate server that mean the server is full requested
             if(!response) {
-                const size = this.queue.length() + 1; // Pin queue size (turn queue to limited)
+                const size = this.queue.length(); // Pin queue size (turn queue to limited)
                 this.queue.resize(size);
 
-                if(isWasLimitedQueue){
+                if(!isWasLimitedQueue){
                     logger.log(`Resize the ${this.constructor.name} queue size to ${size}`)
                 }
             }
@@ -81,7 +81,7 @@ class Consumer extends Intervalable {
                 item.request_id = response.request_id;
 
                 this.queue.resize(0); // Unpin queue size (turn queue to unlimited)
-                if(!isWasLimitedQueue){
+                if(isWasLimitedQueue){
                     logger.log(`Resize the ${this.constructor.name} queue size to Infinity`);
                 }
 
@@ -91,11 +91,15 @@ class Consumer extends Intervalable {
                 }));
             }
 
-            this.queue.enqueue(item);
+            if(!returnedToQueue){
+                this.queue.enqueue(item);
+                return true;
+            }
         }
+        return false;
     }
 
-    async _handledItemHandler(item){
+    async _handledItemHandler(item, returnedToQueue){
         if(item && item.request_id){
             logger.debug(`ITEM IS HANDLED STATE - SEND REQUEST FOR ASKING RESULT TO HIS REQUEST_ID`);
 
@@ -103,7 +107,7 @@ class Consumer extends Intervalable {
 
             // Then result is null it's mean the server hasn't finished the request_id task yet, so re-enqueue to try in next loop
             if(result){
-                logger.log(`Release place in ${this.constructor.name} queue`);
+                logger.log(`Release place in ${this.constructor.name} queue, {${item.request_id}: ${item.result}`);
                 this.availableEvent.fire(this, new AvailableEventArgs({
                     message: messages.DONE_ITEM_QUEUE(),
                     request_id: item.request_id,
@@ -112,9 +116,13 @@ class Consumer extends Intervalable {
             }
             else {
                 logger.log(`${this.constructor.name} request id: `, item.request_id, 'is not finished yet');
-                this.queue.enqueue(item);
+                if(!returnedToQueue){
+                    this.queue.enqueue(item);
+                    return true;
+                }
             }
         }
+        return false;
     }
 
     async handle() {
@@ -130,9 +138,10 @@ class Consumer extends Intervalable {
         logger.log(`${this.constructor.name} handle item\n`, JSON.stringify(item, null, 4));
 
         try {
+            let returnedToQueue = false;
             this._invalidItemHandler(item);
-            await this._unhandledItemHandler(item);
-            await this._handledItemHandler(item);
+            returnedToQueue = await this._unhandledItemHandler(item, returnedToQueue);
+            returnedToQueue = await this._handledItemHandler(item, returnedToQueue);
         }
         catch (e) {
             const itemDescription = item
@@ -147,6 +156,7 @@ class Consumer extends Intervalable {
     }
 
     consume(item){
+        item.index = this.queue.length();
         this.queue.enqueue(item);
     }
 

@@ -1,4 +1,5 @@
 const Consumer = require('../models/consumer');
+const Item = require('../utils/item');
 
 describe('Test CONSUMER' , function () {
     jest.setTimeout(10000);
@@ -12,7 +13,7 @@ describe('Test CONSUMER' , function () {
 
     it('consumer consume item', () => {
         const consumer = new Consumer(1, 0, false);
-        consumer.consume({inputData: 5, request_id: null});
+        consumer.consume(new Item({data: 5, request_id: null}));
         expect(consumer.queue.isEmpty()).toBeFalsy();
 
         consumer.clear();
@@ -30,7 +31,7 @@ describe('Test CONSUMER' , function () {
 
     it('consumer notify on free space but not empty queue', (done) => {
         const consumer = new Consumer(2, 1, true);
-        consumer.consume({inputData: 1, request_id: '123'});
+        consumer.consume(new Item({data: 1, request_id: '123'}));
         consumer.availableEvent.subscribe((sender, args) => {
             expect(true).toBeTruthy();
             consumer.clear();

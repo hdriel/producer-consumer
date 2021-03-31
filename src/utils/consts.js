@@ -2,9 +2,22 @@ const path = require('path');
 
 const consts = {};
 
-consts.API_END_POINT = 'http://35.195.195.133:9005';
+// I created my server to handle same behavior as the following API Server: 'http://35.195.195.133:9005'
+consts.LOCAL_SERVER = {
+    DYNAMIC_SCALE_TASKS: false,
+    DYNAMIC_SCALE_TASKS_MIN_SIZE: 2,
+    DYNAMIC_SCALE_TASKS_MAX_SIZE: 10,
+    PORT: 3000,
+    API_END_POINT: `http://localhost:3000`,
+    USE_LOCAL_SERVER: true
+};
+
+consts.API_END_POINT = consts.LOCAL_SERVER.USE_LOCAL_SERVER
+    ? consts.LOCAL_SERVER.API_END_POINT
+    : 'http://35.195.195.133:9005';
+
 consts.CONSUMER_SIZE = 2;
-consts.CONSUMER_INTERVAL = 1000;
+consts.CONSUMER_INTERVAL = 500;
 consts.DEBUG_MODE = true;
 consts.LOGGING_MODES = {
     ERROR: 3,

@@ -21,7 +21,7 @@ class Request {
                 method: 'POST',
                 url: this.url,
                 headers: { 'Content-Type': 'application/json' },
-                body: { data: number }
+                data: { data: number }
             })
             .catch(err => {
                 if(err.message === 'Network Error'){
@@ -29,12 +29,12 @@ class Request {
                     throw err.message;
                 }
 
-                const { status, statusText } = err.response || {};
-                if(status === 403){
+                const { status, data } = err && err.response || {};
+                if(status === 403 && data && data.error === 'Max tasks received'){
                     return { data: null };
                 }
 
-                throw statusText;
+                throw err.toString();
             });
         logger.debug('request was successfully send with response request id: ', data );
         return data;
@@ -50,8 +50,8 @@ class Request {
                 url: `${this.url}?request_id=${request_id}`
             })
             .catch(err => {
-                const { status, statusText } = err.response;
-                if(status === 400 && statusText !== 'Bad Request'){
+                const { status, data } = err.response;
+                if(status === 400 && data && data.error === request_id + " is still in progress"){
                     return { data: null };
                 }
 
