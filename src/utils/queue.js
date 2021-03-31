@@ -32,6 +32,12 @@ class Queue {
         this.size = size;
     }
 
+    incSize(){
+        if(this.size){
+            this.size++;
+        }
+    }
+
     isLimitedQueue(){
         return !!this.size;
     }

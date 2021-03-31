@@ -6,7 +6,9 @@ const {
         PORT,
         DYNAMIC_SCALE_TASKS,
         DYNAMIC_SCALE_TASKS_MIN_SIZE,
-        DYNAMIC_SCALE_TASKS_MAX_SIZE
+        DYNAMIC_SCALE_TASKS_MAX_SIZE,
+        TASKS_MIN_SEC,
+        TASKS_MAX_SEC
     }
 } = require('../utils/consts');
 
@@ -32,7 +34,9 @@ class DataModel{
         this.size = size;
         if(DYNAMIC_SCALE_TASKS){
             setInterval(() => {
-                this.size = Math.floor(Math.random() * DYNAMIC_SCALE_TASKS_MAX_SIZE) + DYNAMIC_SCALE_TASKS_MIN_SIZE;
+                this.size = Math.floor(
+                    Math.random() * DYNAMIC_SCALE_TASKS_MAX_SIZE - DYNAMIC_SCALE_TASKS_MIN_SIZE
+                ) + DYNAMIC_SCALE_TASKS_MIN_SIZE;
             }, 3 * 1000);
         }
     }
@@ -46,11 +50,11 @@ class DataModel{
         const request_id = uuid();
         this.data.set(request_id, { data, result: null });
 
-        const randomJobTimeout = Math.floor(Math.random() * 8) + 2;
+        const randomJobTimeout = Math.floor(Math.random() * TASKS_MAX_SEC - TASKS_MIN_SEC) + TASKS_MIN_SEC;
         setTimeout(() => {
             this.data.set(request_id, {
                 data,
-                result: Math.floor(Math.random() * 1000) + 1
+                result: Math.floor(Math.random() * 1000000 - 10000) + 10000
             });
             this.counter--;
         }, randomJobTimeout * 1000);

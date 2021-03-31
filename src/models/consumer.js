@@ -92,6 +92,9 @@ class Consumer extends Intervalable {
             }
 
             if(!returnedToQueue){
+                if(this.queue.isFull()){
+                    this.queue.resize(this.queue.size+1);
+                }
                 this.queue.enqueue(item);
                 return true;
             }
@@ -103,11 +106,12 @@ class Consumer extends Intervalable {
         if(item && item.request_id){
             logger.debug(`ITEM IS HANDLED STATE - SEND REQUEST FOR ASKING RESULT TO HIS REQUEST_ID`);
 
-            const result = await request.getResponse(item.request_id);
+            const { result } = await request.getResponse(item.request_id) || {};
 
             // Then result is null it's mean the server hasn't finished the request_id task yet, so re-enqueue to try in next loop
             if(result){
-                logger.log(`Release place in ${this.constructor.name} queue, {${item.request_id}: ${item.result}`);
+                item.result = result;
+                logger.log(`Release place in ${this.constructor.name} queue, { '${item.request_id}': ${result} }`);
                 this.availableEvent.fire(this, new AvailableEventArgs({
                     message: messages.DONE_ITEM_QUEUE(),
                     request_id: item.request_id,
@@ -117,6 +121,9 @@ class Consumer extends Intervalable {
             else {
                 logger.log(`${this.constructor.name} request id: `, item.request_id, 'is not finished yet');
                 if(!returnedToQueue){
+                    if(this.queue.isFull()){
+                        this.queue.resize(this.queue.size+1);
+                    }
                     this.queue.enqueue(item);
                     return true;
                 }
@@ -155,9 +162,15 @@ class Consumer extends Intervalable {
         }
     }
 
-    consume(item){
+    async consume(item){
         item.index = this.queue.length();
-        this.queue.enqueue(item);
+        await this._unhandledItemHandler(item, true); // to limit the queue size on consume
+        if(item.request_id){
+            this.queue.enqueue(item);
+        }
+        else{
+            throw 'max tasks received';
+        }
     }
 
     clear(){

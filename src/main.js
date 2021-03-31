@@ -20,13 +20,17 @@ const Consumer = require('./models/consumer');
     }, 0);
 
     // Consumer subscribe event handler for available place in consumer queue.
-    consumer.availableEvent.subscribe((sender, args) => {
+    consumer.availableEvent.subscribe(async (sender, args) => {
+        sender.queue.incSize();
         const item = producer.pull();
 
         if(item){
             sender.reFireAvailableEvent = false;
             logger.debug(sender.constructor.name, ' Consume more item: ', JSON.stringify(item));
-            sender.consume(item);
+            await sender.consume(item).catch(err => {
+                logger.error(err);
+                producer.produce(item.data);
+            });
         }
         else{
             // If consumer not consume any item, steel there are more space to the next loop
