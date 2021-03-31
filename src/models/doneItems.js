@@ -19,7 +19,11 @@ class DoneItems {
             this.queue.elements.map(d => JSON.stringify(d)),
             null,
             4
-        );
+        )
+            .replace(/\\"/gmi, '')
+            .replace(/,/gmi, ', ')
+            .replace(/"{/gmi, '{ ')
+            .replace(/}"/gmi, ' }');
     }
 }
 
