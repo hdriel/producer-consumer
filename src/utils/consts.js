@@ -30,5 +30,7 @@ consts.LOGGING_MODES = {
 consts.LOGGING_MODE = consts.LOGGING_MODES.INFO;
 
 consts.INPUT_FILE_NAME = path.resolve(__dirname, '../data/inputs.txt');
+consts.OUTPUT_FILE_NAME = path.resolve(__dirname, '../data/output.txt');
+consts.WRITE_OUTPUT_TO_FILE_INTERVAL = 3000;
 
 module.exports = consts

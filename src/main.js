@@ -42,7 +42,8 @@ const doneItems = require('./models/doneItems');
         const isFinishedProgram = (
             doneReadFile &&
             producer.queue.isEmpty() &&
-            consumer.queue.isEmpty()
+            consumer.queue.isEmpty() &&
+            doneItems.queue.isEmpty()
         );
         if(isFinishedProgram){
             logger.log('');
@@ -50,7 +51,6 @@ const doneItems = require('./models/doneItems');
             logger.log('* !!! DONE HANDLER ALL DATA ITEMS !!! *');
             logger.log('*'.repeat(39))
             logger.log('DONE ITEMS');
-            logger.log(doneItems.toString());
             process.exit(0);
         }
     });
