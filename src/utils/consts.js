@@ -11,7 +11,7 @@ consts.LOCAL_SERVER = {
     TASKS_MAX_SEC: 8,
     PORT: 3000,
     API_END_POINT: `http://localhost:3000`,
-    USE_LOCAL_SERVER: false
+    USE_LOCAL_SERVER: true
 };
 
 consts.API_END_POINT = consts.LOCAL_SERVER.USE_LOCAL_SERVER
